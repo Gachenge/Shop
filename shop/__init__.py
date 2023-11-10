@@ -24,12 +24,17 @@ def create_app():
     from shop.oauth.github.routes import github_bp
     from shop.oauth.google.routes import auth
     from shop.oauth.inApp.routes import inapp_bp
-
+    from shop.category.routes import category_bp
+    from shop.buyer.routes import buyer_bp
+    from shop.product.routes import product_bp
 
     #register blueprints
     app.register_blueprint(github_bp, url_prefix='/api/github')
     app.register_blueprint(auth)
     app.register_blueprint(inapp_bp)
+    app.register_blueprint(category_bp)
+    app.register_blueprint(buyer_bp)
+    app.register_blueprint(product_bp)
 
     # Initialize CORS
     CORS(app, supports_credentials=True)

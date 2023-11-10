@@ -14,6 +14,9 @@ class Users(Basemodel, Base):
     password = db.Column(db.String(100), default=None)
     role = db.Column(db.String(30), default='GUEST')
     is_active = db.Column(db.Boolean, default=False)
+    account_balance = db.Column(db.Float, default=False)
+    stripe_account_id = db.Column(db.String(255), default=None, nullable=True)
+    google_payment_id = db.Column(db.String(255), default=None, nullable=True)
     
 
     # Define the relationship through the association table
@@ -21,7 +24,8 @@ class Users(Basemodel, Base):
     products_for_sale = db.relationship('Product', backref='seller', lazy='dynamic')
     orders = db.relationship('Order', backref='user', lazy='dynamic')
 
-    def __init__(self, name, email, username, avatar=None, token=None, password=None, role='GUEST', is_active=False):
+    def __init__(self, name, email, username, avatar=None, token=None, password=None, role='GUEST',
+                is_active=False, stripe_account_id=None, google_payment_method_id=None):
         self.name = name
         self.email = email
         self.username = username
@@ -30,3 +34,5 @@ class Users(Basemodel, Base):
         self.password = password
         self.role = role
         self.is_active = is_active
+        self.stripe_account_id = stripe_account_id
+        self.google_payment_method_id = google_payment_method_id

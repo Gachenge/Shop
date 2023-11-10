@@ -9,12 +9,9 @@ def generate_verification_token(user_id):
     # Create a serializer with a secret key and an expiration time (in seconds)
     s = Serializer(App_Config.SECRET_KEY)  # Token expires in 1 hour
 
-    # Convert the UUID to a string before serializing
-    user_id_str = str(user_id)
-
     # Create the token
     expiration_time = int(time.time()) + 86400
-    token_data = {'user_id': user_id_str, "exp": expiration_time}
+    token_data = {'user_id': user_id, "exp": expiration_time}
     token = s.dumps(token_data)
     return token
 
@@ -25,12 +22,10 @@ def verify_verification_token(token):
         # Deserialize the token and extract the user_id as a string
         data = s.loads(token, max_age=3600)
         if time.time() <= data.get("exp", 0):
-            user_id_str = data.get('user_id')
+            user_id = data.get('user_id')
         else:
             raise Exception("Token has expired")
 
-        # Convert the string back to a UUID
-        user_id = UUID(user_id_str)
         return user_id
     except Exception as e:
         # Token is invalid or has expired
@@ -60,8 +55,8 @@ def login_is_required(function):
 
     return decorated_function
 
-# Wrapper function to make sure the user is a librarian
-def librarian_required(function):
+# Wrapper function to make sure the user is an admin
+def admin_required(function):
     @wraps(function)
     def decorated_function(*args, **kwargs):
         jwt_token = request.headers.get('Authorization')
@@ -77,7 +72,7 @@ def librarian_required(function):
                 user = Users.query.get(user_id)
                 if not user:
                     return jsonify({"error": "User not found"}), 404
-                if user.role == 'LIBRARIAN':
+                if user.role == 'ADMIN':
                     return function(*args, **kwargs)
 
             return jsonify({"error": "Invalid or expired token"}), 401
